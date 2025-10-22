@@ -1,5 +1,128 @@
 import UIKit
 
+//MARK: How to store ordered data in arrays
+
+var beatles = ["John", "Paul", "George", "Ringo"]
+var temperatures = [25.3, 28.2, 26.4]
+
+print(beatles[0])
+print(temperatures[2])
+
+///Eğer diziniz değişkense (variable), oluşturduktan sonra onu değiştirebilirsiniz. Örneğin, yeni öğeler eklemek için append() kullanabilirsiniz:
+beatles.append("Allen")
+beatles.append("Adrian")
+beatles.append("Novall")
+beatles.append("Vivian")
+
+var scores = Array<Int>()
+scores.append(100)
+scores.append(80)
+scores.append(85)
+print(scores[1])
+
+var albums = Array<String>()
+albums.append("Folklore")
+albums.append("Fearless")
+albums.append("Red")
+
+var albums2 = [String]()
+albums2.append("Folklore")
+albums2.append("Fearless")
+albums2.append("Red")
+
+///Tıpkı string'lerde yaptığınız gibi, bir dizide kaç öğe olduğunu okumak için .count özelliğini kullanabilirsiniz:
+print(albums.count)
+
+///İkinci olarak, remove(at:) kullanarak belirli bir indeksteki bir öğeyi kaldırabilir veya removeAll() kullanarak her şeyi kaldırabilirsiniz:
+
+var characters = ["Lana", "Pam", "Ray", "Sterling"]
+print(characters.count)
+
+characters.remove(at: 2)
+print(characters.count)
+
+characters.removeAll()
+print(characters.count)
+
+///Üçüncü olarak, contains() kullanarak bir dizinin belirli bir öğeyi içerip içermediğini kontrol edebilirsiniz, şu şekilde:
+let bondMovies = ["Casino Royale", "Spectre", "No Time To Die"]
+print(bondMovies.contains("Frozen"))
+
+///Dördüncü olarak, sorted() kullanarak bir diziyi sıralayabilirsiniz, şu şekilde:
+let cities = ["London", "Tokyo", "Rome", "Budapest"]
+print(cities.sorted())
+///Bu, öğeleri artan düzende (string'ler için alfabetik, sayılar için sayısal olarak) sıralanmış yeni bir dizi döndürür – orijinal dizi değişmeden kalır.
+
+///Son olarak, reversed() çağırarak bir diziyi tersine çevirebilirsiniz:
+let presidents = ["Bush", "Obama", "Trump", "Biden"]
+let reversedPresidents = presidents.reversed()
+print(reversedPresidents)
+
+
+//MARK: How to store and find data in dictionaries
+///Sözlükler, öğeleri diziler gibi konumlarına göre saklamaz, bunun yerine öğelerin nerede saklanacağına bizim karar vermemize izin verir.
+
+let employee2 = ["name": "Taylor Swift", "job": "Singer", "location": "Nashville"]
+print(employee2["name"])
+print(employee2["job"])
+print(employee2["location"])
+//Bunu bir playground'da denerseniz, Xcode'un “Expression implicitly coerced from 'String?' to 'Any’” (İfade dolaylı olarak 'String?' türünden 'Any' türüne zorlandı) gibi çeşitli uyarılar verdiğini göreceksiniz. Daha da kötüsü, playground'unuzun çıktısına bakarsanız, sadece Taylor Swift yerine Optional("Taylor Swift") yazdırdığını göreceksiniz – neler oluyor?
+print(employee2["password"])
+print(employee2["status"])
+print(employee2["manager"])
+//Bunların hepsi geçerli Swift kodudur, ancak kendilerine bağlı bir değeri olmayan sözlük anahtarlarını okumaya çalışıyoruz. Elbette, Swift burada da, tıpkı var olmayan bir dizi indeksini okursanız çökeceği gibi çökebilirdi, ancak bu, çalışmayı çok zorlaştırırdı – en azından 10 öğeli bir diziniz varsa, 0'dan 9'a kadar olan indeksleri okumanın güvenli olduğunu bilirsiniz.
+//Bu yüzden, Swift bir alternatif sunar: Bir sözlüğün içindeki verilere eriştiğinizde, size “bir değer geri alabilirsiniz, ancak hiçbir şey de geri alamayabilirsiniz” der. Swift bunlara opsiyoneller (optionals) der çünkü verinin varlığı isteğe bağlıdır (opsiyoneldir) - orada olabilir de, olmayabilir de.
+//Bir sözlükten okuma yaparken, anahtar mevcut değilse kullanılacak bir varsayılan (default) değer sağlayabilirsiniz.
+print(employee2["name", default: "Unknown"])
+print(employee2["job", default: "Unknown"])
+print(employee2["location", default: "Unknown"])
+
+
+var heights = [String: Int]()
+heights["Yao Ming"] = 229
+heights["Shaquille O'Neal"] = 216
+heights["LeBron James"] = 206
+
+//MARK: How to use sets for fast data lookup
+///Verileri gruplamanın küme (set) adı verilen üçüncü çok yaygın bir yolu daha vardır – bunlar dizilere benzerler, ancak yinelenen (duplicate) öğeler ekleyemezsiniz ve öğelerini belirli bir sırada saklamazlar.
+let people = Set(["Denzel Washington", "Tom Cruise", "Nicolas Cage", "Samuel L Jackson"])
+print(people) //Küme, öğelerinin hangi sırada geldiğini umursamaz.
+///Bunun aslında önce bir dizi oluşturduğuna, sonra bu diziyi kümeye koyduğuna dikkat ettiniz mi? Bu kasıtlıdır ve sabit veriden bir küme oluşturmanın standart yolu budur. Unutmayın, küme yinelenen değerleri otomatik olarak kaldıracak ve dizide kullanılan tam sırayı hatırlamayacaktır.
+
+
+var people2 = Set<String>()
+people2.insert("Denzel Washington")
+people2.insert("Tom Cruise")
+people2.insert("Nicolas Cage")
+people2.insert("Samuel L Jackson")
+//insert() kullandığımıza dikkat ettiniz mi? Bir string dizimiz olduğunda, append() çağırarak öğe ekliyorduk, ancak bu isim burada mantıklı değil – öğeyi kümenin sonuna eklemiyoruz, çünkü küme öğeleri istediği sırada saklayacaktır.
+//Bir küme üzerinde contains() çağırmak o kadar hızlı çalışır ki, bunu anlamlı bir şekilde ölçmekte zorlanırsınız. Hatta, kümede bir milyon öğeniz, hatta 10 milyon öğeniz olsa bile, anında çalışır; oysa bir dizinin aynı işi yapması dakikalar veya daha uzun sürebilir.
+
+
+//MARK: How to create and use enums
+
+enum Weekday {
+    case monday
+    case tuesday
+    case wednesday
+    case thursday
+    case friday
+}
+
+var day = Weekday.monday
+day = Weekday.tuesday
+day = Weekday.friday
+
+enum Weekday2 {
+    case monday, tuesday, wednesday, thursday, friday
+}
+
+///Bir değişkene veya sabite bir değer atadığınızda, veri türünün sabitlendiğini hatırlayın – bir değişkeni önce bir string, daha sonra bir tam sayı olarak ayarlayamazsınız. Enum'lar için bu, ilk atamadan sonra enum adını atlayabileceğiniz anlamına gelir, şu şekilde:
+var day2 = Weekday.monday
+day2 = .tuesday
+day2 = .friday
+
+
 //MARK: Arithmetic Operators
 let first = 12
 let second = 5

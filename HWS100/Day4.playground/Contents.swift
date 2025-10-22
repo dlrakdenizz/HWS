@@ -1,5 +1,22 @@
 import UIKit
 
+//MARK: How to use type annotations
+///Swift, bir sabitin veya değişkenin, ona ne atadığımıza bağlı olarak ne tür bir veri tuttuğunu anlayabilir. Ancak, bazen bir değeri hemen atamak istemeyiz veya bazen Swift'in tür seçimini geçersiz kılmak isteriz; işte bu noktada tür belirtme (type annotations) devreye girer.
+var score: Double = 0
+let playerName: String = "Roy"
+var luckyNumber: Int = 13
+let pi: Double = 3.141
+var isAuthenticated: Bool = true
+var albumss: [String] = ["Red", "Fearless"]
+var user: [String: String] = ["id": "@twostraws"]
+var books: Set<String> = Set(["The Bluest Eye", "Foundation", "Girl, Woman, Other"])
+var soda: [String] = ["Coke", "Pepsi", "Irn-Bru"]
+
+//Boş başlatmak için
+var teams: [String] = [String]()
+var cities: [String] = []
+var clues = [String]()
+
 //MARK: For loops
 let albums = ["Red", "1989", "Reputation"]
 
@@ -14,11 +31,11 @@ for _ in 1...5 {
 
 //MARK: While loops
 
-var number = 1
+var numberrr = 1
 
-while number <= 20 {
-    print(number)
-    number += 1
+while numberrr <= 20 {
+    print(numberrr)
+    numberrr += 1
 }
 print("Önüm arkam saklanmayan sobe!")
 
@@ -44,24 +61,24 @@ print("Önüm arkam saklanmayan sobe!")
 
 ///Swift'in for ve while döngüleri, döngü oluşturmanın ezici çoğunlukla en yaygın yollarıdır. Ancak, bir while döngüsüne benzeyen fakat döngü gövdesini her zaman en az bir kez çalıştıran repeat adında üçüncü bir seçeneğimiz de vardır. Bu fark o kadar küçük ki, ne anlamı olduğunu merak edebilirsiniz – eğer kodun her zaman en az bir kez çalışmasını istiyorsak, neden onu hem döngü gövdesinin içine hem de döngüden önce koymayalım ki? Cevap, kısmen programcıların "DRY" dediği bir şeydir: Kendini Tekrar Etme (Don't Repeat Yourself). Genellikle kodu bir kez ve sadece bir kez yazmayı tercih ederiz ve tekrarlanan kodu bir şeylerin yanlış gittiğinin bir işareti olarak görürüz.
 
-let numbers = [1, 2, 3, 4, 5]
-let random = numbers.shuffled()
+let numberss = [1, 2, 3, 4, 5]
+let random = numberss.shuffled()
  ///Yukarıdaki örnekte: 1, 2, 3, 4, 5'i karıştırmak, 5, 4, 3, 2, 1 elde edebileceğimiz anlamına gelebilir, 1, 4, 3, 5, 2 elde edebileceğimiz anlamına gelebilir veya başlangıçta verdiğimiz dizinin aynısı olan 1, 2, 3, 4, 5'i geri alabileceğimiz anlamına gelebilir.
 
-let numbers = [1, 2, 3, 4, 5]
-var random = numbers.shuffled()
+let numberssss = [1, 2, 3, 4, 5]
+var random2 = numberssss.shuffled()
 
-while random == numbers {
-    random = numbers.shuffled()
+while random2 == numberssss {
+    random2 = numberssss.shuffled()
 }
 ///Gördüğünüz gibi, yukarıda shuffled() metodunu iki yerde tekrar etmemize neden oldu.
 
 
 let numbers = [1, 2, 3, 4, 5]
-var random: [Int]
+var random3: [Int]
 
 repeat {
-    random = numbers.shuffled()
+    random3 = numbers.shuffled()
 } while random == numbers
 
 
@@ -120,7 +137,28 @@ while true {
     print(" ")
     counter += 1
     
-    if counter = 273 {
+    if counter == 273 {
         break
+    }
+}
+
+
+//CHECKPOINT
+
+var checkpoint = ["a", "b", "c", "d", "a"]
+print(checkpoint.count)
+print(Set(checkpoint))
+
+//CHECKPOINT
+
+for i in 1...100 {
+    if i.isMultiple(of: 3) && i.isMultiple(of: 5)  {
+        print("FizzBuzz")
+    } else if i.isMultiple(of: 3) {
+        print("Fizz")
+    }else if i.isMultiple(of: 5) {
+        print("Buzz")
+    } else {
+        print(i)
     }
 }
