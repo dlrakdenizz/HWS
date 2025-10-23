@@ -285,3 +285,31 @@ doubleInPlace(number: &myNum)
 func +=(leftNumber: inout Int, rightNumber: Int) {
     // kod burada
 }
+
+
+//CHECKPOINT
+enum SqrtError: Error {
+    case outOfBounds
+    case noRoot
+}
+
+func squareRoot(number :Int) throws -> Int {
+    
+    if number < 1 || number > 10_000 {
+        throw SqrtError.outOfBounds
+        }
+    
+    for i in 1...100 {
+        if i * i == number {
+            return i
+        }
+        if i * i > number {
+            throw SqrtError.noRoot
+        }
+    }
+    throw SqrtError.noRoot
+}
+
+squareRoot(number: 5)
+
+
