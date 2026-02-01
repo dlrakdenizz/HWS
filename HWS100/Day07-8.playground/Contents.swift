@@ -310,6 +310,6 @@ func squareRoot(number :Int) throws -> Int {
     throw SqrtError.noRoot
 }
 
-squareRoot(number: 5)
+try squareRoot(number: 5)
 
 
