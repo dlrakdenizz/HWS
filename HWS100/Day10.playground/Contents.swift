@@ -128,3 +128,89 @@ struct User {
 
 //Açıkçası, tek gerçek fark şudur: metotlar bir tipe aittir (örneğin struct, enum veya class), fonksiyonlar ise herhangi bir tipe ait değildir. Hepsi bu — fark sadece bundan ibarettir. Her ikisi de istenilen sayıda parametre alabilir (variadic parametreler dahil) ve her ikisi de değer döndürebilir. Hatta o kadar benzerdirler ki, Swift bir metodu tanımlarken bile hâlâ func anahtar kelimesini kullanır. Elbette, struct gibi belirli bir tipe bağlı olmak metotlara önemli bir “süper güç” kazandırır: Aynı tipin içindeki diğer property’lere ve metotlara erişebilirler. Bu sayede, örneğin bir User tipi için kullanıcının adını, yaşını ve şehrini yazdıran bir describe() metodu yazabilirsiniz. Metotların bir avantajı daha vardır, ama bu biraz daha ince bir detaydır: namespace (isim alanı) kirliliğini önlerler. Bir fonksiyon oluşturduğumuzda, o fonksiyonun adı kodumuzda genel bir anlam kazanır — örneğin wakeUp() yazdığımızda, bu fonksiyon her yerden çağrılabilir. 100 fonksiyon yazarsanız 100 tane, 1000 fonksiyon yazarsanız 1000 tane “rezerve edilmiş” isim oluşur. Bu durum çok hızlı bir şekilde karmaşık hale gelebilir. Ancak işlevselliği metotlar içine koyduğumuzda, bu isimlerin nerelerde kullanılabileceğini sınırlandırmış oluruz. Artık wakeUp() tek başına rezerve edilmiş bir isim değildir; yalnızca someUser.wakeUp() yazdığımızda anlam kazanır. Bu da sözde isim kirliliğini azaltır; çünkü kodumuzun büyük kısmı metotlardan oluşuyorsa, yanlışlıkla isim çakışmaları yaşama ihtimalimiz düşer.
 
+//MARK: How to compute property values dynamically
+
+//Struct’ler iki tür özelliğe (property) sahip olabilir: stored property bir struct örneğinin içinde bir veri parçasını tutan değişken ya da sabittir; computed property ise her erişildiğinde değerini dinamik olarak hesaplar. Bu da computed property’lerin, stored property’ler ile fonksiyonların bir karışımı olduğu anlamına gelir: stored property gibi erişilirler, ama fonksiyon gibi çalışırlar.
+
+struct Person {
+    var age: Int
+}
+
+var person = Person(age: 20)
+print(person.age)   // 20
+
+person.age = 25     // doğrudan yazıyoruz
+
+//Burada olan şey çok net:
+//age bellekte saklanan bir değer
+//Okurken bellektekini alıyoruz
+//Yazarken bellektekini değiştiriyoruz
+//➡️ Hiç ekstra mantık yok
+
+struct Rectangle {
+    var width: Int
+    var height: Int
+
+    var area: Int {
+        width * height
+    }
+}
+
+let rect = Rectangle(width: 10, height: 5)
+print(rect.area)
+
+//area bellekte saklanmıyor. Swift şunu yapıyor: “Biri area isterse → width * height hesapla, sonucu ver”
+
+//var area: Int {
+//    get {
+//        width * height
+//    }
+//}
+
+//rect.area = 100 ❌
+//Swift diyor ki:
+//“Ben bu değeri nasıl yazacağımı bilmiyorum.”
+//Çünkü:
+//area hesaplanıyor
+//Ama nereye yazılacağı belli değil
+//width mi değişsin?
+//height mı değişsin?
+//ikisi birden mi?
+//İşte burada setter devreye giriyor.
+
+struct Rectangle2 {
+    var width: Int
+    var height: Int
+
+    var area: Int {
+        get {
+            width * height
+        }
+        set {
+            width = newValue / height
+        }
+    }
+}
+
+//Burada:
+//newValue → atanmaya çalışılan değer
+//rect.area = 100 yazarsan:
+//newValue = 100
+
+//var rect = Rectangle(width: 10, height: 5)
+//
+//print(rect.area) // 50
+//
+//rect.area = 100
+//
+//print(rect.width)  // 20
+//print(rect.area)   // 100
+
+//Ne zaman getter–setter yazmalıyım?
+//✔️ Şu durumlarda:
+//Bir değer başka değerlerden hesaplanıyorsa
+//Yazıldığında özel bir mantık çalışmalıysa
+//Veri tutarlılığı önemliyse
+//❌ Şu durumlarda gerekmez:
+//Sadece saklanacak basit bir değer varsa
+
