@@ -214,3 +214,65 @@ struct Rectangle2 {
 //❌ Şu durumlarda gerekmez:
 //Sadece saklanacak basit bir değer varsa
 
+
+
+//MARK: How to take action when a property changes
+
+//Swift, property observer (özellik gözlemcisi) oluşturmamıza izin verir. Bunlar, bir property değiştiğinde çalışan özel kod parçalarıdır. İki türü vardır:
+//didSet: Property değiştikten sonra çalışır.
+//willSet: Property değişmeden hemen önce çalışır.
+
+struct Game {
+    var score = 0
+}
+
+var game = Game()
+game.score += 10
+print("Score is now \(game.score)")
+game.score -= 5
+print("Score is now \(game.score)")
+game.score += 2
+
+//Bu kod bir Game struct’ı oluşturur ve score değerini birkaç kez değiştirir. Her değişiklikten sonra print() ile yeni skoru yazdırıyoruz. Ancak burada bir hata var: En sonda skor değişti ama yazdırılmadı.
+//Property observer kullanarak bu sorunu çözebiliriz. didSet ile print() çağrısını doğrudan property’ye bağlayabiliriz. Böylece değer ne zaman ve nerede değişirse değişsin, otomatik olarak belirli bir kod çalıştırılır.
+
+struct Game2 {
+    var score = 0 {
+        didSet {
+            print("Score is now \(score)")
+        }
+    }
+}
+
+var game2 = Game2()
+game.score += 10
+game.score -= 3
+game.score += 1
+
+//İsterseniz Swift, didSet içinde otomatik olarak oldValue sabitini de sağlar. Bu, değişiklikten önceki değeri tutar ve özel işlemler yapmak istediğinizde kullanabilirsiniz.
+//Ayrıca bir de willSet vardır. Bu, property değişmeden önce çalışır ve atanacak yeni değeri newValue adıyla sağlar. Böylece yeni değere göre farklı işlemler yapabilirsiniz.
+
+struct App {
+    var contacts = [String]() {
+        willSet {
+            print("Current value is: \(contacts)")
+            print("New value will be: \(newValue)")
+        }
+
+        didSet {
+            print("There are now \(contacts.count) contacts.")
+            print("Old value was \(oldValue)")
+        }
+    }
+}
+
+var app = App()
+app.contacts.append("Adrian E")
+app.contacts.append("Allen W")
+app.contacts.append("Ish S")
+
+//Bir diziye (array) eleman eklemek (append) hem willSet hem de didSet’i tetikler. Bu yüzden kod çalıştığında oldukça fazla çıktı üretir.
+//Pratikte willSet, didSet’e göre daha az kullanılır; ancak yine de zaman zaman karşınıza çıkabilir, bu yüzden varlığını bilmek önemlidir.
+
+//Property değiştiğinde ilgili fonksiyonu çağırmayı hatırlamak tamamen size kalmıştır. Eğer unutursanız, kodunuzda gizemli hatalar oluşabilir. Öte yandan, işlevselliği didSet kullanarak doğrudan property’ye bağlarsanız, bu her zaman gerçekleşir. Böylece kontrolü Swift’e devretmiş olursunuz ve zihninizi daha ilginç problemlere odaklayabilirsiniz.
+//Ancak property observer kullanmanın kötü bir fikir olduğu bir durum vardır: içine yavaş (maliyetli) işlemler koyduğunuzda. Örneğin User adında bir struct’ınız ve içinde age adında bir Int property olduğunu düşünün. age değerini değiştirmenin neredeyse anında gerçekleşmesini beklersiniz – sonuçta bu sadece bir sayı. Eğer didSet içine zaman alan ağır işlemler koyarsanız, basit bir tamsayı değişikliği bile beklediğinizden çok daha uzun sürebilir ve bu da çeşitli performans sorunlarına yol açabilir.
