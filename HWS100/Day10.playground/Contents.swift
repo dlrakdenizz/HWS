@@ -276,3 +276,50 @@ app.contacts.append("Ish S")
 
 //Property değiştiğinde ilgili fonksiyonu çağırmayı hatırlamak tamamen size kalmıştır. Eğer unutursanız, kodunuzda gizemli hatalar oluşabilir. Öte yandan, işlevselliği didSet kullanarak doğrudan property’ye bağlarsanız, bu her zaman gerçekleşir. Böylece kontrolü Swift’e devretmiş olursunuz ve zihninizi daha ilginç problemlere odaklayabilirsiniz.
 //Ancak property observer kullanmanın kötü bir fikir olduğu bir durum vardır: içine yavaş (maliyetli) işlemler koyduğunuzda. Örneğin User adında bir struct’ınız ve içinde age adında bir Int property olduğunu düşünün. age değerini değiştirmenin neredeyse anında gerçekleşmesini beklersiniz – sonuçta bu sadece bir sayı. Eğer didSet içine zaman alan ağır işlemler koyarsanız, basit bir tamsayı değişikliği bile beklediğinizden çok daha uzun sürebilir ve bu da çeşitli performans sorunlarına yol açabilir.
+
+
+//MARK: How to create custom initializers
+
+//Initializer’lar (başlatıcılar), yeni bir struct örneğini kullanıma hazır hale getirmek için tasarlanmış özel metotlardır. Daha önce, bir struct içine koyduğumuz özelliklere (property) göre Swift’in bizim için sessizce bir initializer oluşturduğunu görmüştük. Ancak tek bir altın kurala uyduğunuz sürece kendi initializer’ınızı da yazabilirsiniz: initializer sona erdiğinde tüm özellikler bir değere sahip olmalıdır.
+
+struct Player {
+    let name: String
+    let number: Int
+}
+
+let player = Player(name: "Megan R", number: 15)
+
+//Bu kod, iki özelliği için değer sağlayarak yeni bir Player örneği oluşturur. Swift buna memberwise initializer der; yani her özelliği tanımlandığı sıraya göre parametre olarak alan bir initializer.
+
+struct Player2 {
+    let name2: String
+    let number2: Int
+    
+    init(name: String, number: Int) {
+        self.name2 = name
+        self.number2 = number
+    }
+}
+
+//func anahtar kelimesi yoktur. Sözdizimi olarak bir fonksiyona benzer, ancak Swift initializer’ları özel olarak ele alır.
+//Yeni bir Player örneği oluşturmasına rağmen initializer’ların açıkça bir dönüş tipi (return type) yoktur – her zaman ait oldukları türü döndürürler.
+//Parametreleri property’lere atarken self kullandım. Bu, “name parametresini benim name property’me ata” anlamını netleştirir.
+
+struct Player3 {
+    let name3: String
+    let number3: Int
+    
+    init(name: String) {
+        self.name3 = name
+        number3 = Int.random(in: 1...99)
+    }
+}
+
+let player3 = Player3(name: "Megan R")
+print(player3.number3)
+
+//Yine altın kuralı unutmayın: initializer sona erdiğinde tüm property’ler bir değere sahip olmalıdır. Eğer number için initializer içinde bir değer atamasaydık, Swift kodu derlemeyi reddederdi.Önemli: Struct içindeki diğer metotları initializer içinde çağırabilirsiniz, ancak bunu tüm property’lere değer atamadan önce yapamazsınız – Swift her şeyin güvenli olduğundan emin olmak ister.
+
+//İsterseniz struct’larınıza birden fazla initializer ekleyebilir, ayrıca dış parametre isimleri (external parameter names) ve varsayılan değerler gibi özelliklerden yararlanabilirsiniz. Ancak kendi custom initializer’ınızı yazdığınız anda, Swift’in otomatik olarak oluşturduğu memberwise initializer’ı kaybedersiniz (onu korumak için ekstra adımlar atmadığınız sürece). Bu kasıtlıdır: Eğer özel bir initializer yazdıysanız, Swift sizin property’leri özel bir şekilde başlatmanız gerektiğini varsayar ve bu nedenle varsayılan initializer’ı artık sunmaz.
+
+
