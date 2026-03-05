@@ -129,3 +129,39 @@ class Piano: Instrument {
 }
 
 //Yukarıdaki gibi bir tanımda child class init'te parametre olarak almadan değer vererek de yapabiliriz.
+
+//MARK: How to copy classes
+
+//Swift'te, bir sınıf örneğinin tüm kopyaları aynı veriyi paylaşır, yani bir kopyada yaptığınız herhangi bir değişiklik diğer kopyaları da otomatik olarak değiştirir. Bunun nedeni, sınıfların Swift'te referans türleri olmasıdır, bu da bir sınıfın tüm kopyalarının aynı veriye işaret etmesi anlamına gelir.
+
+class User2 {
+    var username = "Anonymous"
+}
+
+//Bu sadece bir özelliğe sahip, ancak bir sınıf içinde saklandığı için tüm kopyalar arasında paylaşılacaktır.
+
+var user1 = User2()
+var user2 = user1
+user2.username = "Taylor"
+
+print(user1.username)
+print(user2.username)
+//Bu bir hata gibi görünebilir, ancak aslında bir özellik – ve gerçekten önemli bir özellik, çünkü uygulamanın tüm bölümlerinde ortak verileri paylaşmamıza olanak tanır. Gördüğünüz gibi, SwiftUI çok fazla sınıf kullanır çünkü verileri bu kadar kolay paylaşabilmesi çok önemlidir.
+//Buna karşılık, yapılar (struct) verilerini kopyalar arasında paylaşmaz, yani kodumuzdaki class User'ı struct User olarak değiştirirsek farklı bir sonuç alırız: “Anonymous” ve “Taylor”yı yazdırır çünkü kopyayı değiştirmek orijinali de değiştirmez.
+
+//Bir sınıf örneğinin benzersiz bir kopyasını oluşturmak isterseniz – buna bazen derin kopya (deep copy) denir – yeni bir örnek oluşturup tüm verilerin güvenli bir şekilde kopyalanmasını sağlamalısınız.
+
+class User3 {
+    var username = "Anonymous"
+
+    func copy() -> User3 {
+        let user = User3()
+        user.username = username
+        return user
+    }
+}
+
+//Bu ayrımın teknik terimi "değer türleri (value types) vs referans türleri (reference types)"dir. Yapılar değer türleridir, yani 5 gibi bir sayı veya "merhaba" gibi bir string gibi basit değerleri tutarlar. Yapınızın ne kadar çok özelliği veya metodu olursa olsun, hala bir sayı gibi tek bir basit değer olarak kabul edilir. Öte yandan, sınıflar referans türleridir; yani başka bir yerdeki bir değere atıfta bulunurlar.
+//Birçok programlama konusunda olduğu gibi, yaptığınız seçimler bir miktar mantığınızı da yansıtmalıdır. Bu durumda, bir sınıf yerine bir yapı kullanmak, verinin bir şekilde paylaşılmasını istediğinizi ve birçok farklı kopya yerine tek bir paylaşılmış veri kullanmak istediğinizi güçlü bir şekilde ileten bir mesajdır.
+
+
