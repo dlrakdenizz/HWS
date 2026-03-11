@@ -164,4 +164,195 @@ class User3 {
 //Bu ayrımın teknik terimi "değer türleri (value types) vs referans türleri (reference types)"dir. Yapılar değer türleridir, yani 5 gibi bir sayı veya "merhaba" gibi bir string gibi basit değerleri tutarlar. Yapınızın ne kadar çok özelliği veya metodu olursa olsun, hala bir sayı gibi tek bir basit değer olarak kabul edilir. Öte yandan, sınıflar referans türleridir; yani başka bir yerdeki bir değere atıfta bulunurlar.
 //Birçok programlama konusunda olduğu gibi, yaptığınız seçimler bir miktar mantığınızı da yansıtmalıdır. Bu durumda, bir sınıf yerine bir yapı kullanmak, verinin bir şekilde paylaşılmasını istediğinizi ve birçok farklı kopya yerine tek bir paylaşılmış veri kullanmak istediğinizi güçlü bir şekilde ileten bir mesajdır.
 
+//MARK: How to create a deinitializer for a class
 
+//Swift’te class’lara isteğe bağlı olarak bir deinitializer (yıkıcı) eklenebilir. Bu, initializer (başlatıcı)’ın tam tersine benzer: initializer nesne oluşturulurken çağrılır, deinitializer ise nesne yok edilirken çağrılır.
+
+//Bununla ilgili birkaç küçük kural vardır:
+//Tıpkı initializer’larda olduğu gibi, deinitializer yazarken func kullanılmaz – bunlar özel yapılardır.
+//Deinitializer’lar parametre alamaz ve veri döndüremez. Bu yüzden parantez bile kullanılmaz.
+//Bir class örneğinin son kopyası yok edildiğinde, deinitializer otomatik olarak çağrılır. Örneğin, bir fonksiyon içinde oluşturulan bir nesne fonksiyon bittiğinde yok olabilir.
+//Deinitializer’ları asla doğrudan çağırmayız; sistem onları otomatik olarak çalıştırır.
+//Struct’ların deinitializer’ı yoktur, çünkü onları kopyalayamazsınız.
+
+//Büyük resme baktığınızda, bunların hepsinin scope oluşturmak için süslü parantez {} kullandığını görürsünüz: koşullar, döngüler ve fonksiyonların hepsi yerel kapsam oluşturur.
+//Bir değer scope dışına çıktığında, oluşturulduğu bağlam ortadan kalkıyor demektir.
+//Struct’larda bu, verinin tamamen yok edilmesi anlamına gelir.
+//Class’larda ise yalnızca veriye işaret eden referanslardan biri yok olur; başka referanslar hâlâ var olabilir.
+//Ama son referans da yok olduğunda (yani o class örneğine işaret eden son değişken veya sabit silindiğinde), o zaman:
+//alttaki veri tamamen yok edilir
+//kullandığı bellek sistem tarafından geri alınır
+
+class UserDeinit {
+    let id: Int
+
+    init(id: Int) {
+        self.id = id
+        print("User \(id): I'm alive!")
+    }
+
+    deinit {
+        print("User \(id): I'm dead!")
+    }
+}
+
+for i in 1...3 {
+    let user = UserDeinit(id: i)
+    print("User \(user.id): I'm in control!")
+}
+
+print("**************************************")
+
+var users = [UserDeinit]()
+
+for i in 1...3 {
+    let user = UserDeinit(id: i)
+    print("User \(user.id): I'm in control!")
+    users.append(user)
+}
+
+print("Loop is finished!")
+users.removeAll()
+print("Array is clear!")
+
+
+//Deinitializer ne işe yarar? Deinitializer’ın görevi, bir class örneğinin yok edildiği anı bize bildirmektir. Struct’larda bu oldukça basittir: Bir struct, onu tutan şey artık var olmadığında yok edilir. Örneğin: Eğer bir struct’ı bir metodun içinde oluşturursanız metod bittiğinde struct da yok edilir.
+//Class’larda durum neden daha karmaşıktır? Class’ların kopyalanma davranışı daha karmaşıktır. Programın farklı yerlerinde aynı class’ın birden fazla kopyası bulunabilir. Ancak bu kopyaların hepsi aynı alttaki veriyi işaret eder. Bu yüzden gerçek class örneğinin ne zaman yok edildiğini anlamak zorlaşır. Gerçek yok oluş şu anda gerçekleşir: O class’a işaret eden son değişken de ortadan kalktığında.
+
+//ARC (Automatic Reference Counting) Swift arka planda ARC (Automatic Reference Counting) adı verilen bir sistem kullanır. ARC’nin görevi: Her class örneğinin kaç referansı olduğunu takip etmek.
+//Şöyle çalışır:
+//Bir class’ın kopyasını aldığınızda → referans sayısı +1
+//Bir kopya yok edildiğinde → referans sayısı −1
+//Referans sayısı 0 olduğunda: Artık kimse o class’ı kullanmıyor demektir. Swift deinitializer’ı çağırır. Nesne tamamen yok edilir
+
+//Struct’larda neden deinitializer yok? Basit sebep: Struct’ların her biri kendi verisinin ayrı bir kopyasına sahiptir. Bu yüzden bir struct yok edildiğinde özel bir işlem yapılmasına gerek yoktur.
+//Pratikte çoğu geliştirici deinitializer’ı class’ın en sonunda yazar.
+
+
+//MARK: How to work with variables inside classes
+
+//Swift’te class’lar birer işaret tabelası (signpost) gibi çalışır: Bir class örneğinin yaptığımız her kopyası, aslında aynı temel veriye işaret eden bir tabeladır. Bu çoğunlukla bir kopyayı değiştirdiğimizde diğerlerinin de değişmesinde önemlidir, ama aynı zamanda class’ların değişken özellikleri (variable properties) nasıl ele aldığı konusunda da önemlidir.
+
+class UserChangeProperty {
+    var name = "Paul"
+}
+
+let user = UserChangeProperty()
+user.name = "Taylor"
+print(user.name)
+
+//Bu kod sabit (constant) bir User nesnesi oluşturur, ama sonra onu değiştirir – yani sabit bir değeri değiştiriyor gibi görünür. Aslında sabit değer değişmiyor. Evet, class içindeki veri değişti, ama class örneğinin kendisi değişmedi. Oluşturduğumuz nesne hâlâ aynı nesne ve biz onu let ile sabit yaptığımız için zaten değiştirilemez.Bunu şöyle düşünebilirsiniz: Biz bir kullanıcıyı gösteren sabit bir tabela koyduk. Ama kullanıcının isim etiketini silip yeni bir isim yazdık. Kullanıcının kendisi değişmedi – hâlâ aynı kişi – sadece içindeki bir bilgi değişti. Eğer name özelliğini de let ile sabit yapsaydık, o zaman değiştirilemezdi. Yani kullanıcıyı gösteren sabit bir tabela var ve ismi kalıcı mürekkeple yazılmış, artık silinemez.
+
+
+//Eğer hem user nesnesini hem de name özelliğini değişken (var) yaparsak, o zaman: özelliği değiştirebiliriz istersek tamamen yeni bir User nesnesiyle değiştirebiliriz. Bunu tabela benzetmesiyle düşünürsek, tabelayı başka bir kişiyi gösterecek şekilde çevirmek gibidir.
+
+class UserChangeProperty2 {
+    var name = "Paul"
+}
+
+var userX = UserChangeProperty2()
+userX.name = "Taylor"
+userX = UserChangeProperty2()
+print(userX.name)
+
+//Bu kod "Paul" yazdırır. Çünkü: Önce name değerini "Taylor" yaptık. Sonra user nesnesini tamamen yeni bir User ile değiştirdik. Yeni nesne tekrar "Paul" değeriyle başlar.
+
+//Eğer nesne değişken ama özellik sabit olursa: yeni bir User oluşturabiliriz ama oluşturulduktan sonra özellikleri değiştirilemez.
+
+
+//Böylece dört farklı kombinasyon oluşur
+//Sabit nesne, sabit özellik
+//→ Hep aynı kullanıcıyı gösteren tabela, ismi hiç değişmez.
+
+//Sabit nesne, değişken özellik
+//→ Tabela hep aynı kullanıcıyı gösterir, ama kullanıcının adı değişebilir.
+
+//Değişken nesne, sabit özellik
+//→ Tabela farklı kullanıcıları gösterebilir, ama isimleri değişmez.
+
+//Değişken nesne, değişken özellik
+//→ Tabela farklı kullanıcıları gösterebilir ve isimleri de değişebilir.
+
+
+//Struct’larda bu durum farklıdır çünkü:
+//Struct’lar tabelaya benzemez, veriyi doğrudan içinde tutar.
+//Bu yüzden sabit bir struct’ın özellikleri değiştirilemez, özellikler var olsa bile.
+//Çünkü struct içindeki bir değeri değiştirmek demek struct’ın kendisini değiştirmek demektir. Ama struct sabitse bu mümkün değildir.
+
+//Bu durumun bir avantajı da vardır:
+//Class’larda veri değiştiren metotlar için mutating yazmamıza gerek yoktur.
+//Bu anahtar kelime struct’lar için önemlidir çünkü:
+//sabit struct’ların özellikleri değiştirilemez
+//bu yüzden Swift, mutating bir metot sabit struct üzerinde çağrılırsa hata verir.
+//Class’larda ise:
+//nesnenin var veya let olması önemli değildir
+//önemli olan özelliğin kendisinin var mı let mi olduğudur.
+
+
+
+
+
+
+
+
+
+//MARK: CHECKPOINT 7
+class Animal {
+    var legCount : Int
+    init(legCount: Int) {
+        self.legCount = legCount
+    }
+}
+
+//Dog
+class Dog: Animal {
+    func speak() {
+        print("Woof!")
+    }
+}
+
+class Corgi: Dog {
+    override func speak() {
+        print("Arf!")
+    }
+}
+
+class Poddle: Dog {
+    override func speak() {
+        print("Bark!")
+    }
+}
+
+//Cat
+class Cat: Animal {
+    var isTame: Bool
+    
+    init(isTame: Bool, legCount: Int) {
+        self.isTame = isTame
+        super.init(legCount: legCount)
+    }
+    
+    func speak() {
+        print("Meow!")
+    }
+}
+
+class Persian: Cat {
+    override func speak() {
+        print("Meowwww")
+    }
+}
+
+class Lion: Cat {
+    override func speak() {
+        print("Roar")
+    }
+}
+
+let corgi = Corgi(legCount: 4)
+print(corgi.legCount)
+corgi.speak()
+
+let lion = Lion(isTame: false, legCount: 4)
+print(lion.legCount)
+lion.speak()
